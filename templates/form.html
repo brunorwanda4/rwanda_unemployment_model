@@ -1,307 +1,169 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rwanda Youth Unemployment Predictor</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Removed custom CSS as DaisyUI provides styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .history-table { margin-top: 30px; }
+        .form-label { font-weight: bold; }
+        .result-section { margin-top: 20px; padding: 15px; border-radius: 5px; }
+        .result-success { background-color: #d1e7dd; border: 1px solid #badbcc; }
+        .result-warning { background-color: #fff3cd; border: 1px solid #ffecb5; }
+        .result-danger  { background-color: #f8d7da; border: 1px solid #f5c2c7; }
+        .history-table th, .history-table td { font-size: 0.9em; }
+    </style>
 </head>
-<body class="p-4"> {# Added padding to the body #}
-    <div class="container mx-auto"> {# Centered container #}
-        <h1 class="text-2xl font-bold mb-4">Rwanda Youth Unemployment Predictor</h1> {# Styled heading with Tailwind classes #}
+<body>
+    <div class="container">
+        <h1 class="mb-4">Rwanda Youth Unemployment Predictor</h1>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div class="space-y-4 mb-4"> {# Added space between alerts and margin below #}
                 {% for category, message in messages %}
-                {# DaisyUI alert classes: alert, alert-info, alert-success, alert-warning, alert-error #}
-                {# Mapping Bootstrap categories to DaisyUI: primary -> info, success -> success, warning -> warning, danger -> error #}
-                <div class="alert {% if category == 'success' %}alert-success{% elif category == 'warning' %}alert-warning{% elif category == 'danger' %}alert-error{% else %}alert-info{% endif %}" role="alert">
-                    {# DaisyUI alerts often include an icon. Added a placeholder for now. Replace with actual SVG icons if desired. #}
-                    {% if category == 'success' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    {% elif category == 'warning' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                    {% elif category == 'danger' %}
-                     <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    {% else %} {# Default to info for other categories like primary #}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    {% endif %}
-
-                    <span>{{ message }}</span>
-                    {# DaisyUI dismiss button - requires some JS to hide the parent alert #}
-                    {# Removed Bootstrap's data-bs-dismiss and aria-label #}
-                    {# For a simple hide, you could add an onclick to set parentElement.style.display = 'none' #}
-                    {# A more robust solution would involve a JS framework or vanilla JS event delegation #}
-                    <button type="button" class="btn btn-sm btn-circle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor %}
-                </div>
             {% endif %}
         {% endwith %}
 
         <form action="/" method="POST">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"> {# Using DaisyUI/Tailwind grid with gap #}
+            <div class="row g-3">
 
-                <div class="form-control w-full"> {# DaisyUI form control wrapper #}
-                    <label class="label" for="Sex"> {# DaisyUI label #}
-                        <span class="label-text">Gender:</span> {# DaisyUI label text #}
-                    </label>
-                    <select class="select select-bordered w-full" id="Sex" name="Sex" required> {# DaisyUI select with bordered style #}
-                         <option value="" disabled {{ 'selected' if not form_data.get('Sex') }}>Select...</option>
-                         {% for option in options.Sex_options %}
-                         <option value="{{ option }}" {{ 'selected' if form_data.get('Sex') == option }}>{{ option }}</option>
-                         {% endfor %}
+                <div class="col-md-4">
+                    <label for="Sex" class="form-label">Gender:</label>
+                    <select class="form-select" id="Sex" name="Sex" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('Sex') }}>Select...</option>
+                        {% for option in options.Sex_options %}
+                        <option value="{{ option }}" {{ 'selected' if form_data.get('Sex') == option }}>{{ option }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
-                <div class="form-control w-full">
-                    <label class="label" for="Relationship">
-                        <span class="label-text">Relationship to Head:</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="Relationship" name="Relationship" required>
+                <div class="col-md-4">
+                    <label for="Relationship" class="form-label">Relationship to Head:</label>
+                    <select class="form-select" id="Relationship" name="Relationship" required>
                        <option value="" disabled {{ 'selected' if not form_data.get('Relationship') }}>Select...</option>
-                       {% for option in options.Relationship_options %}
-                       <option value="{{ option }}" {{ 'selected' if form_data.get('Relationship') == option }}>{{ option }}</option>
-                       {% endfor %}
+                        {% for option in options.Relationship_options %}
+                        <option value="{{ option }}" {{ 'selected' if form_data.get('Relationship') == option }}>{{ option }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
-                <div class="form-control w-full">
-                    <label class="label" for="Marital_status">
-                        <span class="label-text">Marital Status:</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="Marital_status" name="Marital_status" required>
-                         <option value="" disabled {{ 'selected' if not form_data.get('Marital_status') }}>Select...</option>
-                         {% for option in options.Marital_status_options %}
-                         <option value="{{ option }}" {{ 'selected' if form_data.get('Marital_status') == option }}>{{ optionेटिक
-Here is the provided HTML file styled using DaisyUI class names, replacing the original Bootstrap classes.
-
-Key changes include:
-- Replacing Bootstrap grid classes (`container`, `row`, `col-*`, `g-3`) with Tailwind CSS flexbox and grid utilities (`container`, `mx-auto`, `grid`, `grid-cols-*`, `gap-*`, `w-full`, `md:w-*`).
-- Replacing Bootstrap form classes (`form-label`, `form-select`, `form-control`) with DaisyUI form component classes (`form-control`, `label`, `label-text`, `select`, `input`, `select-bordered`, `input-bordered`).
-- Replacing Bootstrap button classes (`btn`, `btn-primary`, `d-grid`, `gap-2`) with DaisyUI button classes (`btn`, `btn-primary`, `w-full`, `max-w-sm`, `mx-auto`) and Tailwind spacing/layout utilities.
-- Replacing Bootstrap alert classes (`alert`, `alert-{{ category }}`, `alert-dismissible`, `fade`, `show`) with DaisyUI alert classes (`alert`, `alert-{{ category }}`) and adding placeholder SVG icons (you might want to replace these with appropriate icons). The Bootstrap dismissal JavaScript is removed, and a basic DaisyUI close button structure is added (requires separate JavaScript for functionality).
-- Replacing Bootstrap table classes (`table`, `table-striped`, `table-bordered`, `table-responsive`) with DaisyUI table classes (`table`, `table-bordered`) and Tailwind's `overflow-x-auto` for responsiveness. Note that `table-striped` is not a direct DaisyUI class and would require adding a Tailwind utility like `even:bg-base-200` to the `tbody` rows if desired.
-- Removing the Bootstrap JavaScript bundle as it's not needed for DaisyUI.
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rwanda Youth Unemployment Predictor</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@latest/dist/full.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.jsdelivr.net/npm/tailwindcss@latest"></script>
-    <!-- Removed custom CSS as DaisyUI provides styling -->
-</head>
-<body class="p-4 min-h-screen bg-base-200"> {# Added padding and a subtle background color to the body #}
-    <div class="container mx-auto p-4 bg-base-100 rounded-lg shadow-xl"> {# Centered container with padding, background, rounded corners, and shadow #}
-        <h1 class="text-2xl font-bold mb-6 text-center">Rwanda Youth Unemployment Predictor</h1> {# Styled heading with Tailwind classes and centered text #}
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="space-y-4 mb-6"> {# Added space between alerts and margin below #}
-                {% for category, message in messages %}
-                {# DaisyUI alert classes: alert, alert-info, alert-success, alert-warning, alert-error #}
-                {# Mapping Bootstrap categories to DaisyUI: primary -> info, success -> success, warning -> warning, danger -> error #}
-                <div class="alert {% if category == 'success' %}alert-success{% elif category == 'warning' %}alert-warning{% elif category == 'danger' %}alert-error{% else %}alert-info{% endif %}">
-                    {# DaisyUI alerts often include an icon. Added placeholder SVGs. Replace with actual desired icons. #}
-                    {% if category == 'success' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    {% elif category == 'warning' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                    {% elif category == 'danger' %}
-                     <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    {% else %} {# Default to info for other categories like primary #}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    {% endif %}
-
-                    <span>{{ message }}</span>
-                    {# DaisyUI dismiss button - requires some JavaScript to hide the parent alert #}
-                    {# Removed Bootstrap's data-bs-dismiss and aria-label #}
-                    {# You can add an onclick="this.parentElement.style.display='none'" for a simple hide #}
-                    <button type="button" class="btn btn-sm btn-circle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
+                <div class="col-md-4">
+                    <label for="Marital_status" class="form-label">Marital Status:</label>
+                    <select class="form-select" id="Marital_status" name="Marital_status" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('Marital_status') }}>Select...</option>
+                        {% for option in options.Marital_status_options %}
+                        <option value="{{ option }}" {{ 'selected' if form_data.get('Marital_status') == option }}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
 
-        <form action="/" method="POST">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"> {# Using DaisyUI/Tailwind grid with gap #}
-
-                <div class="form-control w-full"> {# DaisyUI form control wrapper #}
-                    <label class="label" for="Sex"> {# DaisyUI label #}
-                        <span class="label-text">Gender:</span> {# DaisyUI label text #}
-                    </label>
-                    <select class="select select-bordered w-full" id="Sex" name="Sex" required> {# DaisyUI select with bordered style #}
-                         <option value="" disabled {{ 'selected' if not form_data.get('Sex') }}>Select...</option>
-                         {% for option in options.Sex_options %}
-                         <option value="{{ option }}" {{ 'selected' if form_data.get('Sex') == option }}>{{ option }}</option>
+                 <div class="col-md-4">
+                    <label for="Unpaid_work" class="form-label">Did Unpaid Work?:</label>
+                    <select class="form-select" id="Unpaid_work" name="Unpaid_work" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('Unpaid_work') }}>Select...</option>
+                         {% for option in options.Unpaid_work_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('Unpaid_work') == option }}>{{ option }}</option>
                          {% endfor %}
                     </select>
                 </div>
 
-                <div class="form-control w-full">
-                    <label class="label" for="Relationship">
-                        <span class="label-text">Relationship to Head:</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="Relationship" name="Relationship" required>
-                       <option value="" disabled {{ 'selected' if not form_data.get('Relationship') }}>Select...</option>
-                       {% for option in options.Relationship_options %}
-                       <option value="{{ option }}" {{ 'selected' if form_data.get('Relationship') == option }}>{{ option }}</option>
-                       {% endfor %}
-                    </select>
-                </div>
-
-                <div class="form-control w-full">
-                    <label class="label" for="Marital_status">
-                        <span class="label-text">Marital Status:</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="Marital_status" name="Marital_status" required>
-                         <option value="" disabled {{ 'selected' if not form_data.get('Marital_status') }}>Select...</option>
-                         {% for option in options.Marital_status_options %}
-                         <option value="{{ option }}" {{ 'selected' if form_data.get('Marital_status') == option }}>{{ option }}</option>
+                <div class="col-md-4">
+                    <label for="Contract_duration" class="form-label">Contract Duration:</label>
+                     <select class="form-select" id="Contract_duration" name="Contract_duration" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('Contract_duration') }}>Select...</option>
+                         {% for option in options.Contract_duration_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('Contract_duration') == option }}>{{ option }}</option>
                          {% endfor %}
                     </select>
                 </div>
 
-                 <div class="form-control w-full">
-                    <label class="label" for="Unpaid_work">
-                        <span class="label-text">Did Unpaid Work?:</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="Unpaid_work" name="Unpaid_work" required>
-                          <option value="" disabled {{ 'selected' if not form_data.get('Unpaid_work') }}>Select...</option>
-                          {% for option in options.Unpaid_work_options %}
-                          <option value="{{ option }}" {{ 'selected' if form_data.get('Unpaid_work') == option }}>{{ option }}</option>
-                          {% endfor %}
-                    </select>
-                </div>
-
-                <div class="form-control w-full">
-                    <label class="label" for="Contract_duration">
-                        <span class="label-text">Contract Duration:</span>
-                    </label>
-                     <select class="select select-bordered w-full" id="Contract_duration" name="Contract_duration" required>
-                          <option value="" disabled {{ 'selected' if not form_data.get('Contract_duration') }}>Select...</option>
-                          {% for option in options.Contract_duration_options %}
-                          <option value="{{ option }}" {{ 'selected' if form_data.get('Contract_duration') == option }}>{{ option }}</option>
-                          {% endfor %}
-                    </select>
-                </div>
-
-                 <div class="form-control w-full">
-                    <label class="label" for="youngs">
-                        <span class="label-text">Youth Status:</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="youngs" name="youngs" required>
-                          <option value="" disabled {{ 'selected' if not form_data.get('youngs') }}>Select...</option>
-                          {% for option in options.youngs_options %}
-                          <option value="{{ option }}" {{ 'selected' if form_data.get('youngs') == option }}>{{ option }}</option>
-                          {% endfor %}
-                    </select>
-                </div>
-
-                <div class="form-control w-full">
-                    <label class="label" for="Educaional_level">
-                        <span class="label-text">Educational Level:</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="Educaional_level" name="Educaional_level" required>
-                           <option value="" disabled {{ 'selected' if not form_data.get('Educaional_level') }}>Select...</option>
-                          {% for option in options.Educaional_level_options %}
-                           <option value="{{ option }}" {{ 'selected' if form_data.get('Educaional_level') == option }}>{{ option }}</option>
-                          {% endfor %}
-                    </select>
-                </div>
-
-                 <div class="form-control w-full">
-                    <label class="label" for="age5">
-                        <span class="label-text">Age Group (5yr):</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="age5" name="age5" required>
-                         <option value="" disabled {{ 'selected' if not form_data.get('age5') }}>Select...</option>
-                         {% for option in options.age5_options %}
-                         <option value="{{ option }}" {{ 'selected' if form_data.get('age5') == option }}>{{ option }}</option>
+                 <div class="col-md-4">
+                    <label for="youngs" class="form-label">Youth Status:</label> <select class="form-select" id="youngs" name="youngs" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('youngs') }}>Select...</option>
+                         {% for option in options.youngs_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('youngs') == option }}>{{ option }}</option>
                          {% endfor %}
                     </select>
                 </div>
 
-                 <div class="form-control w-full">
-                    <label class="label" for="TVT2">
-                        <span class="label-text">TVET Status:</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="TVT2" name="TVT2" required>
-                           <option value="" disabled {{ 'selected' if not form_data.get('TVT2') }}>Select...</option>
-                           {% for option in options.TVT2_options %}
-                           <option value="{{ option }}" {{ 'selected' if form_data.get('TVT2') == option }}>{{ option }}</option>
-                           {% endfor %}
+                <div class="col-md-4">
+                    <label for="Educaional_level" class="form-label">Educational Level:</label> <select class="form-select" id="Educaional_level" name="Educaional_level" required>
+                          <option value="" disabled {{ 'selected' if not form_data.get('Educaional_level') }}>Select...</option>
+                         {% for option in options.Educaional_level_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('Educaional_level') == option }}>{{ option }}</option>
+                         {% endfor %}
                     </select>
                 </div>
 
-                 <div class="form-control w-full md:col-span-full lg:col-span-1"> {# Adjust span for different screen sizes #}
-                    <label class="label" for="Field_of_education">
-                        <span class="label-text">Field of Education:</span>
-                    </label>
-                     <select class="select select-bordered w-full" id="Field_of_education" name="Field_of_education" required>
-                           <option value="" disabled {{ 'selected' if not form_data.get('Field_of_education') }}>Select...</option>
-                           {% for option in options.Field_of_education_options %}
-                           <option value="{{ option }}" {{ 'selected' if form_data.get('Field_of_education') == option }}>{{ option }}</option>
-                           {% endfor %}
+                 <div class="col-md-4">
+                    <label for="age5" class="form-label">Age Group (5yr):</label>
+                    <select class="form-select" id="age5" name="age5" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('age5') }}>Select...</option>
+                        {% for option in options.age5_options %}
+                        <option value="{{ option }}" {{ 'selected' if form_data.get('age5') == option }}>{{ option }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
-                 <div class="form-control w-full md:col-span-full lg:col-span-1"> {# Adjust span for different screen sizes #}
-                    <label class="label" for="occupation">
-                        <span class="label-text">Occupation:</span>
-                    </label>
-                    <select class="select select-bordered w-full" id="occupation" name="occupation" required>
-                           <option value="" disabled {{ 'selected' if not form_data.get('occupation') }}>Select...</option>
-                           {% for option in options.occupation_options %}
-                           <option value="{{ option }}" {{ 'selected' if form_data.get('occupation') == option }}>{{ option }}</option>
-                           {% endfor %}
+                 <div class="col-md-4">
+                    <label for="TVT2" class="form-label">TVET Status:</label>
+                    <select class="form-select" id="TVT2" name="TVT2" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('TVT2') }}>Select...</option>
+                         {% for option in options.TVT2_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('TVT2') == option }}>{{ option }}</option>
+                         {% endfor %}
                     </select>
                 </div>
 
-                 <div class="form-control w-full">
-                    <label class="label" for="Age">
-                        <span class="label-text">Age:</span>
-                    </label>
-                    <input type="number" class="input input-bordered w-full" id="Age" name="Age" min="15" max="100" step="1" required value="{{ form_data.get('Age', '') }}">
+                 <div class="col-md-6">
+                    <label for="Field_of_education" class="form-label">Field of Education:</label>
+                     <select class="form-select" id="Field_of_education" name="Field_of_education" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('Field_of_education') }}>Select...</option>
+                         {% for option in options.Field_of_education_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('Field_of_education') == option }}>{{ option }}</option>
+                         {% endfor %}
+                    </select>
                 </div>
 
-                 <div class="form-control w-full">
-                    <label class="label" for="hhsize">
-                        <span class="label-text">Household Size (Number):</span>
-                    </label>
-                    <input type="number" class="input input-bordered w-full" id="hhsize" name="hhsize" min="1" step="1" required value="{{ form_data.get('hhsize', '') }}">
+                 <div class="col-md-6">
+                    <label for="occupation" class="form-label">Occupation:</label>
+                    <select class="form-select" id="occupation" name="occupation" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('occupation') }}>Select...</option>
+                         {% for option in options.occupation_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('occupation') == option }}>{{ option }}</option>
+                         {% endfor %}
+                    </select>
                 </div>
 
-                 <div class="form-control w-full">
-                    <label class="label" for="unemployment_duration">
-                        <span class="label-text">Unemployment Duration (Months, 0 if employed):</span>
-                    </label>
-                    <input type="number" class="input input-bordered w-full" id="unemployment_duration" name="unemployment_duration" min="0" step="1" required value="{{ form_data.get('unemployment_duration', '0') }}">
+                 <div class="col-md-4">
+                    <label for="Age" class="form-label">Age:</label>
+                    <input type="number" class="form-control" id="Age" name="Age" min="15" max="100" step="1" required value="{{ form_data.get('Age', '') }}">
                 </div>
 
+                 <div class="col-md-4">
+                    <label for="hhsize" class="form-label">Household Size (Number):</label>
+                    <input type="number" class="form-control" id="hhsize" name="hhsize" min="1" step="1" required value="{{ form_data.get('hhsize', '') }}">
+                </div>
+
+                 <div class="col-md-4">
+                    <label for="unemployment_duration" class="form-label">Unemployment Duration (Months, 0 if employed):</label>
+                    <input type="number" class="form-control" id="unemployment_duration" name="unemployment_duration" min="0" step="1" required value="{{ form_data.get('unemployment_duration', '0') }}">
+                </div>
+
+            </div> <div class="d-grid gap-2 col-6 mx-auto mt-4">
+                <button type="submit" class="btn btn-primary">Predict Employment Status</button>
             </div>
-             <div class="flex justify-center mt-6"> {# Centered button container #}
-                 <button type="submit" class="btn btn-primary w-full max-w-sm">Predict Employment Status</button> {# Styled and constrained button width #}
-             </div>
         </form>
 
         {% if history %}
-        <div class="mt-10"> {# Added top margin #}
-            <h2 class="text-xl font-bold mb-4">Recent Predictions</h2> {# Styled heading #}
-            <div class="overflow-x-auto"> {# Added for responsive horizontal scrolling #}
-                <table class="table w-full table-bordered"> {# DaisyUI table with full width and borders #}
+        <div class="history-table mt-5">
+            <h2>Recent Predictions</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
                     <thead>
                         <tr>
                             <th>Timestamp</th>
@@ -331,18 +193,6 @@ Key changes include:
         </div>
         {% endif %}
 
-    </div>
-    <!-- Removed Bootstrap JavaScript -->
-    <script>
-        // Basic JavaScript for closing alerts (optional)
-        document.addEventListener('DOMContentLoaded', function() {
-            const alertButtons = document.querySelectorAll('.alert .btn-circle');
-            alertButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    this.parentElement.style.display = 'none';
-                });
-            });
-        });
-    </script>
+    </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
