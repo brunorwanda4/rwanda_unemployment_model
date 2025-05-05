@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rwanda Youth Unemployment Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .history-table { margin-top: 30px; }
+        .form-label { font-weight: bold; }
+        .result-section { margin-top: 20px; padding: 15px; border-radius: 5px; }
+        .result-success { background-color: #d1e7dd; border: 1px solid #badbcc; }
+        .result-warning { background-color: #fff3cd; border: 1px solid #ffecb5; }
+        .result-danger  { background-color: #f8d7da; border: 1px solid #f5c2c7; }
+        .history-table th, .history-table td { font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Rwanda Youth Unemployment Predictor</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="/" method="POST">
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label for="Sex" class="form-label">Gender:</label>
+                    <select class="form-select" id="Sex" name="Sex" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('Sex') }}>Select...</option>
+                        {% for option in options.Sex_options %}
+                        <option value="{{ option }}" {{ 'selected' if form_data.get('Sex') == option }}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="Relationship" class="form-label">Relationship to Head:</label>
+                    <select class="form-select" id="Relationship" name="Relationship" required>
+                       <option value="" disabled {{ 'selected' if not form_data.get('Relationship') }}>Select...</option>
+                        {% for option in options.Relationship_options %}
+                        <option value="{{ option }}" {{ 'selected' if form_data.get('Relationship') == option }}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="Marital_status" class="form-label">Marital Status:</label>
+                    <select class="form-select" id="Marital_status" name="Marital_status" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('Marital_status') }}>Select...</option>
+                        {% for option in options.Marital_status_options %}
+                        <option value="{{ option }}" {{ 'selected' if form_data.get('Marital_status') == option }}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                 <div class="col-md-4">
+                    <label for="Unpaid_work" class="form-label">Did Unpaid Work?:</label>
+                    <select class="form-select" id="Unpaid_work" name="Unpaid_work" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('Unpaid_work') }}>Select...</option>
+                         {% for option in options.Unpaid_work_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('Unpaid_work') == option }}>{{ option }}</option>
+                         {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="Contract_duration" class="form-label">Contract Duration:</label>
+                     <select class="form-select" id="Contract_duration" name="Contract_duration" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('Contract_duration') }}>Select...</option>
+                         {% for option in options.Contract_duration_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('Contract_duration') == option }}>{{ option }}</option>
+                         {% endfor %}
+                    </select>
+                </div>
+
+                 <div class="col-md-4">
+                    <label for="youngs" class="form-label">Youth Status:</label> <select class="form-select" id="youngs" name="youngs" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('youngs') }}>Select...</option>
+                         {% for option in options.youngs_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('youngs') == option }}>{{ option }}</option>
+                         {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="Educaional_level" class="form-label">Educational Level:</label> <select class="form-select" id="Educaional_level" name="Educaional_level" required>
+                          <option value="" disabled {{ 'selected' if not form_data.get('Educaional_level') }}>Select...</option>
+                         {% for option in options.Educaional_level_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('Educaional_level') == option }}>{{ option }}</option>
+                         {% endfor %}
+                    </select>
+                </div>
+
+                 <div class="col-md-4">
+                    <label for="age5" class="form-label">Age Group (5yr):</label>
+                    <select class="form-select" id="age5" name="age5" required>
+                        <option value="" disabled {{ 'selected' if not form_data.get('age5') }}>Select...</option>
+                        {% for option in options.age5_options %}
+                        <option value="{{ option }}" {{ 'selected' if form_data.get('age5') == option }}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                 <div class="col-md-4">
+                    <label for="TVT2" class="form-label">TVET Status:</label>
+                    <select class="form-select" id="TVT2" name="TVT2" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('TVT2') }}>Select...</option>
+                         {% for option in options.TVT2_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('TVT2') == option }}>{{ option }}</option>
+                         {% endfor %}
+                    </select>
+                </div>
+
+                 <div class="col-md-6">
+                    <label for="Field_of_education" class="form-label">Field of Education:</label>
+                     <select class="form-select" id="Field_of_education" name="Field_of_education" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('Field_of_education') }}>Select...</option>
+                         {% for option in options.Field_of_education_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('Field_of_education') == option }}>{{ option }}</option>
+                         {% endfor %}
+                    </select>
+                </div>
+
+                 <div class="col-md-6">
+                    <label for="occupation" class="form-label">Occupation:</label>
+                    <select class="form-select" id="occupation" name="occupation" required>
+                         <option value="" disabled {{ 'selected' if not form_data.get('occupation') }}>Select...</option>
+                         {% for option in options.occupation_options %}
+                         <option value="{{ option }}" {{ 'selected' if form_data.get('occupation') == option }}>{{ option }}</option>
+                         {% endfor %}
+                    </select>
+                </div>
+
+                 <div class="col-md-4">
+                    <label for="Age" class="form-label">Age:</label>
+                    <input type="number" class="form-control" id="Age" name="Age" min="15" max="100" step="1" required value="{{ form_data.get('Age', '') }}">
+                </div>
+
+                 <div class="col-md-4">
+                    <label for="hhsize" class="form-label">Household Size (Number):</label>
+                    <input type="number" class="form-control" id="hhsize" name="hhsize" min="1" step="1" required value="{{ form_data.get('hhsize', '') }}">
+                </div>
+
+                 <div class="col-md-4">
+                    <label for="unemployment_duration" class="form-label">Unemployment Duration (Months, 0 if employed):</label>
+                    <input type="number" class="form-control" id="unemployment_duration" name="unemployment_duration" min="0" step="1" required value="{{ form_data.get('unemployment_duration', '0') }}">
+                </div>
+
+            </div> <div class="d-grid gap-2 col-6 mx-auto mt-4">
+                <button type="submit" class="btn btn-primary">Predict Employment Status</button>
+            </div>
+        </form>
+
+        {% if history %}
+        <div class="history-table mt-5">
+            <h2>Recent Predictions</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Education</th>
+                            <th>Field</th>
+                            <th>Occupation</th>
+                            <th>Prediction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in history %}
+                        <tr>
+                            <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') if record.timestamp else 'N/A' }}</td>
+                            <td>{{ record.get('Age', 'N/A') }}</td>
+                            <td>{{ record.get('Sex', 'N/A') }}</td>
+                            <td>{{ record.get('Educaional_level', 'N/A') }}</td>
+                            <td>{{ record.get('Field_of_education', 'N/A') }}</td>
+                            <td>{{ record.get('occupation', 'N/A') }}</td>
+                            <td>{{ record.get('prediction_result_text', 'N/A') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+    </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
