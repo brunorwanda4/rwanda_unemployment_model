@@ -1,6 +1,3 @@
-Absolutely! Here's the corrected and copy-paste-ready version of your `README.md` file, with all markdown and formatting issues fixed so it displays perfectly on GitHub or any Markdown renderer:
-
-```markdown
 # 🇷🇼 Rwanda Unemployment Prediction Model
 
 This project builds and trains a machine learning model to predict unemployment status based on demographic and household data. It uses a `RandomForestClassifier` to classify individuals as "Unemployed" or "Employed/Other" based on features like age, education level, household size, and more.
@@ -9,23 +6,6 @@ This project builds and trains a machine learning model to predict unemployment 
 
 ## 📁 Project Structure
 
-```
-
-rwanda\_unemployment\_model/
-│
-├── data/
-│   └── data.csv                  # Dataset containing household/person information
-│
-├── train\_rwanda\_unemployment.py  # Main script to load, clean, encode and train the model
-│
-├── rwanda\_unemployment\_model/
-│   ├── unemployment\_model.pkl    # Trained model (saved after training)
-│   └── label\_encoders.pkl        # Saved encoders for categorical variables
-│
-├── requirements.txt              # Python dependencies
-└── README.md                     # You're reading this 🙂
-
-````
 
 ---
 
@@ -35,81 +15,14 @@ Install required Python packages:
 
 ```bash
 pip install -r requirements.txt
-````
 
----
-
-## 📊 How It Works
-
-* Reads data from `data/data.csv`
-* Cleans missing values and drops irrelevant columns
-* Encodes categorical variables using `LabelEncoder`
-* Creates a binary target column `is_unemployed`
-* Splits data into training and testing sets
-* Trains a `RandomForestClassifier` with balanced class weights
-* Saves the model and encoders using `joblib`
-
----
-
-## ▶️ Run the Training Script
-
-```bash
 python train_rwanda_unemployment.py
-```
 
-This will output:
 
-* Data loading and cleaning logs
-* Model training and evaluation metrics
-* Saved model and label encoders
-
----
-
-## 📁 Output Files
-
-After training, you’ll find:
-
-* `rwanda_unemployment_model/unemployment_model.pkl`: The trained classifier
-* `rwanda_unemployment_model/label_encoders.pkl`: The label encoders used for categorical features
-
----
-
-## 📌 Notes
-
-* Ensure your input file (`data/data.csv`) has the correct format and column names.
-* The target column is assumed to be `LFP` with the value `'Unemployed'` indicating unemployment.
-* Categorical and numerical features are handled automatically.
-
----
-
-## ✨ Example Data Format
-
-```csv
 pid,Sex,Relationship,Age,Marital_status,Unpaid_work,Contract_duration,LFP,youngs,Educaional_level,age5,hhsize,TVT2,unemployment_duration,Field_of_education,occupation
 10101,Male,Head,30,Married monogamously,,Less than one year,Employed,,Primary,45-49 yrs,9 persons,Completed general,,General education,Service_and_sales_workers
 ...
-```
 
----
 
-## 🧠 Built With
-
-* Python
-* pandas
-* scikit-learn
-* joblib
-* Flask *(optional, for deployment)*
-* MongoDB *(optional, for data storage)*
-
----
-
-## 👤 Author
-
-**Bruno**
-
-Feel free to contribute or suggest improvements!
-
-```
 
 Let me know if you’d like this extended with usage examples for Flask API or how to deploy the model.
-```
