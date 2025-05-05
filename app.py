@@ -50,12 +50,12 @@ try:
     # If not, you might need to load X_train.columns separately or define manually
     # For now, defining manually based on the likely order from training script:
     # (Adjust this list based on the actual columns used in X during training!)
+    # In app.py - this list should be correct now
     EXPECTED_FEATURES = [
         'Sex', 'Relationship', 'Age', 'Marital_status', 'Unpaid_work',
         'Contract_duration', 'youngs', 'Educaional_level', 'age5', 'hhsize',
         'TVT2', 'unemployment_duration', 'Field_of_education', 'occupation'
-        # Make sure this list exactly matches the columns in X used for training
-        # AND their order!
+        # NO 'Unnamed: 16' here!
     ]
     print(f"Model expects features in this order: {EXPECTED_FEATURES}")
 
