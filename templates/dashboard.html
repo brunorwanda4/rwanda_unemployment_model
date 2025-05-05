@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Youth Unemployment Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold mb-6">Youth Unemployment Dashboard</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Historical Trend -->
+      <div class="bg-white p-4 rounded shadow">
+        <h2 class="text-xl font-semibold mb-2">
+          Avg. Risk Over Time (≤30 yrs)
+        </h2>
+        <canvas id="trendChart"></canvas>
+      </div>
+
+      <!-- Key Factors -->
+      <div class="bg-white p-4 rounded shadow">
+        <h2 class="text-xl font-semibold mb-2">Top Correlated Factors</h2>
+        <canvas id="factorsChart"></canvas>
+      </div>
+
+      <!-- Recent Predictions -->
+      <div class="col-span-1 md:col-span-2 bg-white p-4 rounded shadow">
+        <h2 class="text-xl font-semibold mb-2">Recent Predictions</h2>
+        <table class="min-w-full divide-y divide-gray-200 table-auto">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2">Timestamp</th>
+              <th class="px-4 py-2">Age</th>
+              <th class="px-4 py-2">Prediction</th>
+              <th class="px-4 py-2">Recommendations</th>
+            </tr>
+          </thead>
+          <tbody
+            id="recentBody"
+            class="bg-white divide-y divide-gray-200"
+          ></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      async function loadTrend() {
+        const { data } = await axios.get("/api/hist_data");
+        const labels = data.map((d) =>
+          new Date(d.timestamp).toLocaleDateString()
+        );
+        const values = data.map((d) => d.value);
+        new Chart(document.getElementById("trendChart").getContext("2d"), {
+          type: "line",
+          data: {
+            labels,
+            datasets: [{ label: "Avg Risk", data: values, fill: false }],
+          },
+          options: { scales: { y: { beginAtZero: true } } },
+        });
+      }
+
+      async function loadFactors() {
+        const { data } = await axios.get("/api/key_factors");
+        const labels = data.map((d) => d.factor);
+        const values = data.map((d) => d.corr);
+        new Chart(document.getElementById("factorsChart").getContext("2d"), {
+          type: "bar",
+          data: { labels, datasets: [{ label: "Correlation", data: values }] },
+          options: { indexAxis: "y", scales: { x: { beginAtZero: true } } },
+        });
+      }
+
+      async function loadRecent() {
+        const { data } = await axios.get("/api/recent");
+        const tbody = document.getElementById("recentBody");
+        tbody.innerHTML = "";
+        data.forEach((r) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+                <td class="px-4 py-2">${new Date(
+                  r.timestamp
+                ).toLocaleString()}</td>
+                <td class="px-4 py-2">${r.age}</td>
+                <td class="px-4 py-2">${(r.prediction * 100).toFixed(1)}%</td>
+                <td class="px-4 py-2">${r.recommendations.join(", ")}</td>
+            `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Initial load
+      loadTrend();
+      loadFactors();
+      loadRecent();
+      // Refresh recent every minute
+      setInterval(loadRecent, 60000);
+    </script>
+  </body>
+</html>
