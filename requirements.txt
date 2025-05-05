@@ -1,0 +1,13 @@
+# Core libraries
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Machine learning
+scikit-learn>=1.2.0
+joblib>=1.2.0
+
+# Optional web backend (if you later serve model with Flask)
+flask>=2.3.0
+
+# Optional: for database interaction (if used in your app)
+pymongo>=4.3.0
